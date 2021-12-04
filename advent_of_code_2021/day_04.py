@@ -39,39 +39,29 @@ def score(board, marks, n):
     return (board * ~marks).sum() * n
 
 
-# part 1
-
 marks = [np.full(board.shape, False) for board in boards]
 
 def play(boards, marks, nums):
+    scores = {}
+    win_order = []
     for n in nums:
         for i,board,mark in zip(range(len(boards)), boards, marks):
-            mark[np.where(board==n)] = True
-            if win(mark):
-                winning_score = score(board, mark, n)
-                print(f"board {i} wins with a score of {winning_score}!")
-                return
-
-play(boards, marks, nums)
-
-
-# part 2
-
-marks = [np.full(board.shape, False) for board in boards]
-
-def play(boards, marks, nums):
-    won = set()
-    for n in nums:
-        for i,board,mark in zip(range(len(boards)), boards, marks):
-            if i in won:
+            if i in scores:
                 continue
             mark[np.where(board==n)] = True
             if win(mark):
-                won.add(i)
-                if len(won) == len(boards):
-                    winning_score = score(board, mark, n)
-                    print(f"board {i} was last to win with a score of {winning_score}!")
-                    return
+                scores[i] = score(board, mark, n)
+                win_order.append(i)
+    return scores, win_order
 
-play(boards, marks, nums)
+scores, win_order = play(boards, marks, nums)
 
+# part 1
+
+i = win_order[0]
+print(f"board {i} won with a score of {scores[i]}!")
+
+# part 2
+
+i = win_order[-1]
+print(f"board {i} was last to win with a score of {scores[i]}!")
