@@ -2,7 +2,6 @@
 Day 10: Syntax Scoring
 """
 from collections import deque
-import numpy as np
 
 with open("data/day-10.txt") as f:
     lines = [line.strip() for line in f]
@@ -19,8 +18,12 @@ score = {
     '}': 1197,
     '>': 25137,
 }
-
-# part 1
+ac_score = {
+    '(': 1, 
+    '[': 2,
+    '{': 3,
+    '<': 4,
+}
 
 def parse(line):
     stack = deque()
@@ -30,46 +33,18 @@ def parse(line):
         elif c == brackets[stack[-1]]:
             stack.pop()
         elif c in score:
-            return score[c]
+            return score[c], 0
         else:
             raise ValueError(line)
-    return 0
+    else:
+        x = 0
+        for c in reversed(stack):
+            x = 5*x + ac_score[c]
+        return 0, x
 
-print(sum(parse(line) for line in lines))
+scores = [parse(line) for line in lines]
 
+print("part 1:", sum(sc[0] for sc in scores))
 
-# part 2
-
-score2 = {
-    '(': 1, 
-    '[': 2,
-    '{': 3,
-    '<': 4,
-}
-
-def complete(line):
-    stack = deque()
-    for c in line:
-        if c in brackets:
-            stack.append(c)
-        elif c == brackets[stack[-1]]:
-            stack.pop()
-        elif c in score:
-            return 0
-        else:
-            raise ValueError(line)
-
-    x = 0
-    for c in reversed(stack):
-        x = 5*x + score2[c]
-    return x
-
-ac_scores = []
-for line in lines:
-    ac_score = complete(line)
-    if ac_score:
-        ac_scores.append(ac_score)
-
-ac_scores = sorted(ac_scores)
-i = int((len(ac_scores))/2)
-print(ac_scores[i])
+ac_scores = sorted(sc[1] for sc in scores if sc[1])
+print("part 2:", ac_scores[len(ac_scores)//2])
